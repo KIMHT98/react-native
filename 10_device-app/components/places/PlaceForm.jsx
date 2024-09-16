@@ -1,31 +1,82 @@
-import { View, Text, ScrollView, TextInput, StyleSheet } from 'react-native'
-import React, { useState } from 'react'
-import { Colors } from '../../constants/colors'
+import {
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  StyleSheet,
+} from "react-native";
+import React, {
+  useCallback,
+  useState,
+} from "react";
+import ImagePicker from "./ImagePicker";
+import LocationPicker from "./LocationPicker";
+import { Colors } from "./../../constants/colors";
+import Button from "../ui/Button";
+import { Place } from "../../models/place";
 
-export default function PlaceForm() {
-  const [enteredTitle, setEnteredTitle] = useState("")
+export default function PlaceForm({
+  onCreatePlace,
+}) {
+  const [enteredTitle, setEnteredTitle] =
+    useState("");
+  const [selectedImage, setSelectedImage] =
+    useState();
+  const [pickedLocation, setPickedLocation] =
+    useState();
   function changeTitleHandler(enteredText) {
-    setEnteredTitle(enteredText)
+    setEnteredTitle(enteredText);
+  }
+  function takeImageHandler(imageUri) {
+    setSelectedImage(imageUri);
+  }
+  const pickLocationHandler = useCallback(
+    (location) => {
+      setPickedLocation(location);
+    },
+    []
+  );
+  function savePlaceHandler() {
+    const placeData = new Place(
+      enteredTitle,
+      selectedImage,
+      pickedLocation
+    );
+    // console.log(placeData);
+    onCreatePlace(placeData);
   }
   return (
     <ScrollView style={styles.form}>
       <View>
         <Text style={styles.label}>Title</Text>
-        <TextInput style={styles.input} onChangeText={changeTitleHandler} value={enteredTitle} />
+        <TextInput
+          style={styles.input}
+          onChangeText={changeTitleHandler}
+          value={enteredTitle}
+        />
       </View>
+      <ImagePicker
+        onImageTaken={takeImageHandler}
+      />
+      <LocationPicker
+        onLocationPick={pickLocationHandler}
+      />
+      <Button onPress={savePlaceHandler}>
+        장소 추가
+      </Button>
     </ScrollView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    padding: 24
+    padding: 24,
   },
   label: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
-    color: Colors.primary500
+    color: Colors.primary500,
   },
   input: {
     marginVertical: 8,
@@ -34,6 +85,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderBottomColor: Colors.primary700,
     borderBottomWidth: 2,
-    backgroundColor: Colors.primary100
-  }
-})
+    backgroundColor: Colors.primary100,
+  },
+});
